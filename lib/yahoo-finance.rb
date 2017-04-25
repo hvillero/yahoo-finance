@@ -187,7 +187,7 @@ module YahooFinance
 
     def read_quotes(symb_str, cols)
       columns = "#{cols.map { |col| COLUMNS[col][0] }.join("")}"
-      conn = open("https://download.finance.yahoo.com/d/quotes.csv?s=#{URI.escape(symb_str)}&f=#{columns}")
+      conn = open("https://download.finance.yahoo.com/d/quotes.csv?s=#{URI.escape(symb_str)}&f=#{columns}", :allow_redirections => :safe)
       CSV.parse(conn.read, headers: cols)
     end
 
@@ -205,7 +205,7 @@ module YahooFinance
       end
 
      url = "https://ichart.finance.yahoo.com/table.csv?#{params.map{|k, v| "#{k}=#{v}"}.join("&")}"
-     conn = open(url)
+     conn = open(url, :allow_redirections => :safe)
      cols = if options[:period] == :dividends_only
               [:dividend_pay_date, :dividend_yield]
             else
@@ -231,12 +231,12 @@ module YahooFinance
       end
 
      url = "https://ichart.finance.yahoo.com/x?#{params.map{|k, v| "#{k}=#{v}"}.join("&")}"
-     conn = open(url)
+     conn = open(url, :allow_redirections => :safe)
      CSV.parse(conn.read)
     end
 
     def read_symbols(query)
-      conn = open("http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=#{query}&region=US&lang=en-US&callback=YAHOO.Finance.SymbolSuggest.ssCallback")
+      conn = open("http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=#{query}&region=US&lang=en-US&callback=YAHOO.Finance.SymbolSuggest.ssCallback", :allow_redirections => :safe)
       result = conn.read
       result.sub!("YAHOO.Finance.SymbolSuggest.ssCallback(", "").chomp!(");")
       json_result = JSON.parse(result)
